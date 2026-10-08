@@ -8,25 +8,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Télécharger le projet
+      - name: Recuperer les fichiers
         uses: actions/checkout@v4
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Installer Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Extraire le projet Android
         run: |
-          unzip -q NAG_Pensee_Android_V7_Final.zip -d android_project
-          echo "Projet extrait"
+          unzip -q NAG_Pensee_Android_V8.zip -d android_project
 
-      - name: Trouver Gradle
+      - name: Construire APK
         run: |
-          GRADLE_DIR=$(dirname "$(find android_project -name gradlew -type f | head -n 1)")
-          echo "GRADLE_DIR=$GRADLE_DIR" >> $GITHUB_ENV
-- name: Construire APK
-  run: |
-    cd "$GRADLE_DIR"
-    chmod +x gradlew
-    bash ./gradlew assembleDebug
-      - name: Publier APK
+          cd android_project
+          gradle assembleDebug
+
+      - name: Recuperer APK
         uses: actions/upload-artifact@v4
         with:
           name: NAG-Pensee-APK
-          path: "**/build/outputs/apk/**/*.apk"
+          path: android_project/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
