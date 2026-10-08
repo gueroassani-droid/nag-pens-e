@@ -20,13 +20,11 @@ jobs:
         run: |
           GRADLE_DIR=$(dirname "$(find android_project -name gradlew -type f | head -n 1)")
           echo "GRADLE_DIR=$GRADLE_DIR" >> $GITHUB_ENV
-
-      - name: Construire APK
-        run: |
-          cd "$GRADLE_DIR"
-          chmod +x gradlew
-          ./gradlew assembleDebug
-
+- name: Construire APK
+  run: |
+    cd "$GRADLE_DIR"
+    chmod +x gradlew
+    bash ./gradlew assembleDebug
       - name: Publier APK
         uses: actions/upload-artifact@v4
         with:
